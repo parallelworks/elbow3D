@@ -7,8 +7,11 @@ meshParamsFile=$4
 foamCaseTar=$5
 caseDirPath=$6
 
-fOut=$7
-fErr=$8
+#new 
+writeBlockMeshDictScript=$7 #writeBlockMeshDictFile.py
+
+fOut=$8
+fErr=$9
 
 ######
 # SALOMEPATH=/home/marmar/programs-local/SALOME-8.2.0-UB14.04/
@@ -33,6 +36,7 @@ mkdir -p $caseDirPath
 cp $foamCaseTar $caseDirPath
 tar -xf $caseDirPath/$foamDirName.tar -C $caseDirPath
 meshDir=$caseDirPath/$foamDirName/constant/triSurface/
+sysDir=$caseDirPath/$foamDirName/system/
 
 # Generate the stl surfaces files using salome
 
@@ -48,13 +52,16 @@ source $OPENFOAMPATH/etc/bashrc ""
 
 # Generate line emesh files for sharper edges
 
+# Overwrite blockMeshDict file based on bounding box dimension of the input  stl file
+python $writeBlockMeshDictScript $meshDir/walls.stl $sysDir
+
 surfaceFeatureExtract -case  $caseDirPath/$foamDirName/  1>>$fOut 2>>$fErr
 
 blockMesh -case  $caseDirPath/$foamDirName/ 1>>$fOut 2>>$fErr
 
 snappyHexMesh -overwrite -case   $caseDirPath/$foamDirName/ 1>>$fOut 2>>$fErr 
 
-
+python utils/writeBoundaryFile.py $caseDirPath/$foamDirName/constant/polyMesh/    $caseDirPath/$foamDirName/constant/polyMesh/boundary.ref
 cd $caseDirPath/$foamDirName/
 tar -cf constant.tar constant
 cd $WORK_DIR

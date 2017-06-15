@@ -1,1 +1,6 @@
-/data_IO.pyc
+/*.pyc
+/testFOAMBash.sh
+/problemFaces
+/__pycache__/
+/blockMeshDict
+/blockMeshDict.txt

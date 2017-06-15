@@ -3,3 +3,7 @@
 /run???/
 /swiftwork/
 *~
+/*.kml
+/tmp/
+/mainBOP.swift
+/problemFaces
