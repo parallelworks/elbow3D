@@ -18,7 +18,7 @@ string simFilesDir          = strcat(outDir, "simParamFiles/");
 string meshFilesDir         = strcat(outDir, "case"); 
 
 # Script files and utilities
-file meshScript             <"utils/elbow3D_inputFile.py">;
+file geomScript             <"utils/elbow3D_inputFile.py">;
 file metrics2extract        <"inputs/beadOnPlateKPI_short.json">;
 file fFoamCase              <"inputs/openFoamCase.tar">;
 file writeBlockMeshScript   <"utils/writeBlockMeshDictFile.py">;
@@ -39,10 +39,10 @@ app (file cases, file[] simFileParams) writeCaseParamFiles (file sweepParams, st
 	python "utils/writeSimParamFiles.py" filename(cases) simFilesDir "caseParamFile";
 }
 
-app (file fmeshOutTar, file ferr, file fout, file salPort) makeMesh (file meshScript, int caseindex, file utils[], 
+app (file fmeshOutTar, file ferr, file fout, file salPort) prepareCase (file geomScript, int caseindex, file utils[], 
                                                               file fsimParams, string caseDirPath, 
                                                               file writeBlockMeshScript, file fFoamCase) {
-    bash "utils/makeFoamMesh2.sh" caseindex  filename(salPort) filename(meshScript) filename(fsimParams) 
+    bash "utils/preProcess.sh" caseindex  filename(salPort) filename(geomScript) filename(fsimParams) 
          filename(fFoamCase) caseDirPath filename(writeBlockMeshScript) filename(fout) filename(ferr);
 }
 
@@ -65,8 +65,8 @@ foreach fsimParams,i in simFileParams{
     file meshErr         <strcat(errorsDir, "mesh", i, ".err")>;                          
     file meshOut         <strcat(logsDir, "mesh", i, ".out")>;                          
     string caseDirPath = strcat(meshFilesDir, i);
-    file fmeshOutTar     <strcat(caseDirPath, "/openFoamCase/constant.tar")>;
-    (fmeshOutTar, meshErr, meshOut, fsalPortLog) = makeMesh(meshScript, i, utils, fsimParams, caseDirPath, 
+    file fmeshOutTar     <strcat(caseDirPath, "/openFoamCase.tar")>;
+    (fmeshOutTar, meshErr, meshOut, fsalPortLog) = prepareCase(geomScript, i, utils, fsimParams, caseDirPath, 
                                                             writeBlockMeshScript, fFoamCase);
     fallMeshDirs[i] = fmeshOutTar;
     salPortFiles[i] = fsalPortLog;
@@ -79,3 +79,5 @@ foreach fsalPort,i in salPortFiles{
     file salKillOut     <strcat(logsDir, "salomeKill",i,".out")>;                          
     (salKillErr, salKillOut) =  killSalomeInstance(fallMeshDirs,  fsalPort, utils);
 }
+
+

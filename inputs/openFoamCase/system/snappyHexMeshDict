@@ -65,22 +65,22 @@ FoamFile
         {
             pressure-outlet
             {
-                level ( 0 0);
+                level ( @@meshMinLevel@@ @@meshMaxLevel@@);
             }
 
             velocity-inlet-1
             {
-                level ( 0 0);
+                level ( @@meshMinLevel@@ @@meshMaxLevel@@);
             }
 
             velocity-inlet-2
             {
-                level ( 0 0);
+                level ( @@meshMinLevel@@ @@meshMaxLevel@@);
             }
 
             walls
             {
-                level ( 0 0);
+                level ( @@meshMinLevel@@ @@meshMaxLevel@@);
             }
 
         }

@@ -17,10 +17,10 @@ FoamFile
     startFrom startTime;
     startTime 0;
     stopAt endTime;
-    endTime 10.0;
+    endTime @@endTime@@;
     deltaT 0.001;
     writeControl adjustableRunTime;
-    writeInterval 1.0;
+    writeInterval @@writeInterval@@;
     purgeWrite 0;
     writeFormat ascii;
     writePrecision 10;
