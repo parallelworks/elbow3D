@@ -1,5 +1,6 @@
 import sys
 import re
+import os
 
 def xstr(s):
     return '' if s is None else str(s)
@@ -51,10 +52,10 @@ def read_floats_from_file_pointer(file_pointer, flag_str, num_data,
 
 
 def read_float_from_file_pointer(file_pointer, flag_str, delimiter=None,
-                                 startIndex=0,line2StartSearch=0):
+                                 startIndex=0):
     data = []
     num_words_in_flag = len(flag_str.split())
-    file_pointer.seek(line2StartSearch)
+    file_pointer.seek(0)
     for line in file_pointer:
         if textStartsWithExactMath(line, flag_str, delimiter):
             line = line[len(flag_str + xstr(delimiter)):]  # Remove flag from the beginning of line
@@ -63,52 +64,6 @@ def read_float_from_file_pointer(file_pointer, flag_str, delimiter=None,
         print("Error: cannot read ", flag_str, " from input file")
         sys.exit(1)
     return data
-
-
-def read_float_from_strList(text, flag_str, delimiter=None,
-                            startIndex=0,line2StartSearch=0):
-    data = []
-    text = text[line2StartSearch:]
-    for line in text:
-        if textStartsWithExactMath(line, flag_str, delimiter):
-            line = line[len(flag_str + xstr(delimiter)):]  # Remove flag from the beginning of line
-            data = float(line.split(delimiter)[startIndex])
-            break
-    if not isinstance(data, float):
-        print("Error: cannot read ", flag_str, " from input file")
-        sys.exit(1)
-    return data
-
-
-def read_int_from_strList(text, flag_str, delimiter=None,
-                          startIndex=0,line2StartSearch=0):
-    data = []
-    text = text[line2StartSearch:]
-    for line in text:
-        if textStartsWithExactMath(line, flag_str, delimiter):
-            line = line[len(flag_str + xstr(delimiter)):]  # Remove flag from the beginning of line
-            data = int(line.split(delimiter)[startIndex])
-            break
-    if not isinstance(data, int):
-        print("Error: cannot read ", flag_str, " from input file")
-        sys.exit(1)
-    return data
-
-
-def read_str_from_strList(text, flag_str, delimiter=None, startIndex=0,
-                          line2StartSearch=0):
-    str2read = []
-    text = text[line2StartSearch:]
-    for line in text:
-        if textStartsWithExactMath(line, flag_str, delimiter):
-            line = line[len(flag_str + xstr(delimiter)):]  # Remove flag from the beginning of line
-            str2read = line.split(delimiter)[startIndex]
-            break
-    if not isinstance(str2read, str):
-        print("Error: cannot read ", flag_str, " from input file")
-        sys.exit(1)
-    return str2read
-
 
 
 def read_int_from_file_pointer(file_pointer, flag_str, delimiter=None,
@@ -127,6 +82,9 @@ def read_int_from_file_pointer(file_pointer, flag_str, delimiter=None,
 
 
 def open_file(file_name, open_mode="r"):
+    if open_mode == "w":
+        if not os.path.exists(os.path.dirname(file_name)):
+            os.makedirs(os.path.dirname(file_name))
     try:
         file_pointer = open(file_name, open_mode)
         return file_pointer
@@ -135,15 +93,3 @@ def open_file(file_name, open_mode="r"):
         sys.exit(1)
 
 
-def removeLeadSpacesFromFile(strList):
-    noLeadSpaceText = []
-    for line in strList:
-        noLeadSpaceText.append(line.lstrip())
-    return noLeadSpaceText
-
-
-def removeTrailingCharFromLines(strList, character2remove):
-    strippedText = []
-    for line in strList:
-        strippedText.append(line.rstrip().rstrip(character2remove))
-    return strippedText
