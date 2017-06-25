@@ -72,7 +72,9 @@ blockMesh -case  $caseDirPath/$foamDirName/ 1>>$fOut 2>>$fErr
 
 snappyHexMesh -overwrite -case   $caseDirPath/$foamDirName/ 1>>$fOut 2>>$fErr 
 
-python utils/writeBoundaryFile.py $caseDirPath/$foamDirName/constant/polyMesh/    $caseDirPath/$foamDirName/constant/polyMesh/boundary.ref
+cp  $caseDirPath/$foamDirName/constant/polyMesh/boundary  $caseDirPath/$foamDirName/constant/polyMesh/boundary.orig
+
+python utils/writeBoundaryFile.py $caseDirPath/$foamDirName/constant/polyMesh/    $caseDirPath/$foamDirName/constant/polyMesh/boundary.ref 1>>$fOut 2>>$fErr 
 
 cd $caseDirPath/
 tar -cf $foamDirName.tar $foamDirName

@@ -3,6 +3,8 @@ import os
 import re
 import math
 import data_IO
+import sys
+
 
 def getBoundingBoxFromStl(stlFileAddress):
     print(os.getcwd())
@@ -62,12 +64,16 @@ def getBoxVertices(bndBox):
 def getBoundaryMeshInfo(boundaryName, boundary_filePointer):
 
     boundary_filePointer.seek(0)
-    fileText = data_IO.removeLeadSpacesFromFile(boundary_filePointer.readlines())
-    fileText = data_IO.removeTrailingCharFromLines(fileText, ';')
+    fileText = data_IO.removeLeadSpacesFromStrList(boundary_filePointer.readlines())
+    fileText = data_IO.removeTrailingCharFromStrList(fileText, ';')
+    foundBoundary = False
     for line_no, line in enumerate(fileText):
         if line.strip() == boundaryName:
+            foundBoundary = True
             break    # Found the boundary we were looking for
-
+    if not foundBoundary:
+        print("Error: cannot find boundary ", boundaryName, " in", boundary_filePointer.name)
+        sys.exit(1)
     nFaces = data_IO.read_int_from_strList(fileText, 'nFaces', None, 0, line_no)
     startFace = data_IO.read_int_from_strList(fileText, 'startFace', None, 0, line_no)
     return nFaces, startFace
@@ -94,8 +100,8 @@ def getBoundaryMeshInfo(boundaryName, boundary_filePointer):
 #  .....
 def getNumBoundariesFromFile(fp):
     fp.seek(0)
-    fileText = data_IO.removeLeadSpacesFromFile(fp.readlines())
-    fileText = data_IO.removeTrailingCharFromLines(fileText, ';')
+    fileText = data_IO.removeLeadSpacesFromStrList(fp.readlines())
+    fileText = data_IO.removeTrailingCharFromStrList(fileText, ';')
     for line_no, line in enumerate(fileText):
         if line.strip().endswith('('):
             if len(line.strip().rstrip('(')) > 0:
@@ -110,14 +116,14 @@ def getNumBoundariesFromFile(fp):
 
 def getBoundaryTypesFromFile(fp, bndDefStarLine ):
     fp.seek(0)
-    fileText = data_IO.removeLeadSpacesFromFile(fp.readlines())
-    fileText = data_IO.removeTrailingCharFromLines(fileText, ';')
+    fileText = data_IO.removeLeadSpacesFromStrList(fp.readlines())
+    fileText = data_IO.removeTrailingCharFromStrList(fileText, ';')
     fileText = fileText[bndDefStarLine:]
 
     bndTypes = {}
     for line_no, line in enumerate(fileText):
         if line.strip() == '{':
-            bndName = fileText[line_no - 1]
+            bndName = fileText[line_no - 1].rstrip()
             bndTypes[bndName] = {}
             bndTypes[bndName]['type'] = data_IO.read_str_from_strList(fileText, 'type', None, 0, line_no)
 
