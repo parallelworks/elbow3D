@@ -5,7 +5,7 @@ import pvutils
 import data_IO
 import os
 
-
+print(sys.argv)
 if len(sys.argv) < 5:
     print("Number of provided arguments: ", len(sys.argv) - 1)
     print("Usage: pvpython extract.py  <dataFile>  <desiredMetrics.json> <outputDir> <outputMetrics.csv>")
@@ -126,7 +126,7 @@ for kpi in kpihash:
     else:
         export2Blender = False
     if export2Blender:
-        pvutils.exportx3d(outputDir, kpi)
+        pvutils.exportx3d(outputDir, kpi, d, dataReader)
 
 
 fp_csv_metrics.close()

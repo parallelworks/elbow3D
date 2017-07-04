@@ -38,10 +38,10 @@ app (file cases, file[] simFileParams) writeCaseParamFiles (file sweepParams, st
 	python "utils/writeSimParamFiles.py" filename(cases) simFilesDir "caseParamFile";
 }
 
-app (file fcaseTar, file ferr, file fout, file salPort) prepareCase (file geomScript, int caseindex, file utils[], 
+app (file fcaseTar, file ferr, file fout, file salPort) prepareCase (file geomScript, file utils[], 
                                                               file fsimParams, string caseDirPath, 
                                                               file writeBlockMeshScript, file fFoamCase) {
-    bash "utils/preProcess.sh" caseindex  filename(salPort) filename(geomScript) filename(fsimParams) 
+    bash "utils/preProcess.sh" filename(salPort) filename(geomScript) filename(fsimParams) 
          filename(fFoamCase) caseDirPath filename(writeBlockMeshScript) filename(fout) filename(ferr);
 }
 
@@ -75,7 +75,7 @@ foreach fsimParams,i in simFileParams{
     file meshOut         <strcat(logsDir, "mesh", i, ".out")>;                          
     caseDirPaths[i] = strcat(caseDirs, i, "/");
     file fcaseTar     <strcat(caseDirPaths[i], "/openFoamCase.tar")>;
-    (fcaseTar, meshErr, meshOut, fsalPortLog) = prepareCase(geomScript, i, utils, fsimParams, caseDirPaths[i],
+    (fcaseTar, meshErr, meshOut, fsalPortLog) = prepareCase(geomScript, utils, fsimParams, caseDirPaths[i],
                                                             writeBlockMeshScript, fFoamCase);
     fallFoamCaseDirs[i] = fcaseTar;
     salPortFiles[i] = fsalPortLog;

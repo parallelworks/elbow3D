@@ -4,6 +4,7 @@ import re
 import math
 import data_IO
 import sys
+from collections import OrderedDict
 
 
 def getBoundingBoxFromStl(stlFileAddress):
@@ -120,7 +121,7 @@ def getBoundaryTypesFromFile(fp, bndDefStarLine ):
     fileText = data_IO.removeTrailingCharFromStrList(fileText, ';')
     fileText = fileText[bndDefStarLine:]
 
-    bndTypes = {}
+    bndTypes = OrderedDict()
     for line_no, line in enumerate(fileText):
         if line.strip() == '{':
             bndName = fileText[line_no - 1].rstrip()

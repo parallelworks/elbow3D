@@ -1,6 +1,8 @@
 import sys
 import re
 import os
+import tarfile
+
 
 def xstr(s):
     return '' if s is None else str(s)
@@ -130,7 +132,11 @@ def open_file(file_name, open_mode="r"):
         file_pointer = open(file_name, open_mode)
         return file_pointer
     except IOError:
-        print("Error: cannot open input file", file_name)
+        print("Error: cannot open file", file_name)
         sys.exit(1)
 
+
+def tarDirectory(output_filename, source_dir, compressMode="w"):
+    with tarfile.open(output_filename, compressMode) as tar:
+        tar.add(source_dir, arcname=os.path.basename(source_dir))
 

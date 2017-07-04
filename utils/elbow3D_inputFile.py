@@ -43,8 +43,8 @@ in_fp.close()
 salome.salome_init()
 theStudy = salome.myStudy
 
-if not os.path.exists(os.path.dirname(stlOutDir)):
-  os.makedirs(os.path.dirname(stlOutDir))
+if not os.path.exists(stlOutDir):
+  os.makedirs(stlOutDir)
 
 ###
 ### GEOM component

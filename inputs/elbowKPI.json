@@ -34,8 +34,15 @@
 		"maxStreamLength":"200",
         "bodyopacity": "0.3", 
         "type": "StreamLines",
-		"animation": "true",
-		"blender": "false",
+		"animation": "false",
+		"blender": "true",
 		"extractStats":"false"		
+    },
+	    "lineP": {
+        "field": "p", 
+        "image": "plot", 
+        "type": "Line", 
+		"resolution": "20",
+        "position": "56.0 0.0 0.0 56.0 63.0 0.0"
     }
 }

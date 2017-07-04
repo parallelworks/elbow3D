@@ -1,17 +1,16 @@
 #!/bin/bash 
-caseindex=$1
-portlogFile=$2
-meshScript=$3
-paramsFile=$4
+portlogFile=$1
+meshScript=$2
+paramsFile=$3
 
-foamCaseTar=$5
-caseDirPath=$6
+foamCaseTar=$4
+caseDirPath=$5
 
 #new 
-writeBlockMeshDictScript=$7 #writeBlockMeshDictFile.py
+writeBlockMeshDictScript=$6 #writeBlockMeshDictFile.py
 
-fOut=$8
-fErr=$9
+fOut=$7
+fErr=$8
 
 ######
 # SALOMEPATH=/home/marmar/programs-local/SALOME-8.2.0-UB14.04/
@@ -64,7 +63,7 @@ done
 # Generate line emesh files for sharper edges
 
 # Overwrite blockMeshDict file based on bounding box dimension of the input  stl file
-python $writeBlockMeshDictScript $meshDir/walls.stl $sysDir
+python3 $writeBlockMeshDictScript $meshDir/walls.stl $sysDir
 
 surfaceFeatureExtract -case  $caseDirPath/$foamDirName/  1>>$fOut 2>>$fErr
 

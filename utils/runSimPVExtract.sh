@@ -16,7 +16,6 @@ mkdir -p $fOutDir
 WORK_DIR=$(pwd)
 
 pvpythonExtractScript=utils/extract.py
-pythonPlotScript=utils/plot.py
 
 # PARAVIEWPATH="/home/marmar/programs-local/ParaView-5.3.0-Qt5-OpenGL2-MPI-Linux-64bit/bin/"
 # OPENFOAMPATH=/opt/openfoam4/
@@ -44,7 +43,3 @@ controlDictFile=$caseDirPath/$foamDirName/system/controlDict
 
 xvfb-run -a --server-args="-screen 0 1024x768x24" $PARAVIEWPATH/pvpython --mesa-llvm  $pvpythonExtractScript  $controlDictFile $desiredMetricsFile  $pvOutputDir $outputMetrics 1>>$fOut 2>>$fErr
 
-shopt -s nullglob # sets wildcard response to null
-for f in ${pvOutputDir}plot_*.csv;do
-    python $pythonPlotScript $f 
-done
