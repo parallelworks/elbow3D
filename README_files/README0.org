@@ -1,9 +1,22 @@
 # To convert to md use this command (org export doesn't work with nested lists:)
-# pandoc --from org --to markdown_github  README_json0.org  -s -o README_json0.md 
+# pandoc --from org --to markdown_github  README0.org  -s -o README0.md 
 #+OPTIONS: toc:nil
 #+OPTIONS: ^:nil
 
 A Swift workflow for running flow in a 3D Elbow geometry. 
+** Usage
+*** Running the workflow locally without dockers
+	- To run locally without dockers Paraview, openFoam and Salome are required. 
+	  Make sure the installation paths in =swift.conf_local= file are set correctly.
+	- Run the swift workflow:
+	  #+BEGIN_EXAMPLE
+      swift -config swift.conf_local  mainElbow3D.swift
+	  #+END_EXAMPLE
+*** Running the workflow locally with embedded dockers
+	- Run the swift workflow with swift.conf_local_explicitDockers
+	  #+BEGIN_EXAMPLE
+      swift -config swift.conf_local_explicitDockers  mainElbow3D.swift
+	  #+END_EXAMPLE
 
 ** Geometry
    The geometric parameters are specified in =inputs/sweepParams.run=. 

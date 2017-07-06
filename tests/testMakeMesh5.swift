@@ -31,8 +31,8 @@ app (file cases, file[] simFileParams) writeCaseParamFiles (file sweepParams, st
 }
 
 app (file fcaseTar, file ferr, file fout) prepareCase (file geomScript, file utils[], 
-                                                              file fsimParams, string caseDirPath, 
-                                                              file writeBlockMeshScript, file fFoamCase) {
+                                                       file fsimParams, string caseDirPath, 
+                                                       file writeBlockMeshScript, file fFoamCase) {
     makeGeom filename(geomScript) filename(fsimParams) filename(fFoamCase) 
              caseDirPath filename(fout) filename(ferr);
     makeMesh filename(fsimParams) filename(fFoamCase) caseDirPath filename(writeBlockMeshScript) 
@@ -70,16 +70,16 @@ foreach fsimParams,i in simFileParams{
     fallFoamCaseDirs[i] = fcaseTar;
 }
 
-# Run openFoam and extract metrics for each case
-foreach fOpenCaseTar,i in fallFoamCaseDirs{
-    file MetricsOutput  <strcat(caseDirPaths[i], "metrics.csv")>;
-    string extractOutDir = strcat(outDir,"png/",i,"/");
-    file fextractPng[]	 <filesys_mapper;location=extractOutDir>;	
-	file fRunOut       <strcat(logsDir, "extractRun", i, ".out")>;
-	file fRunErr       <strcat(errorsDir, "extractRun", i ,".err")>;
+# # Run openFoam and extract metrics for each case
+# foreach fOpenCaseTar,i in fallFoamCaseDirs{
+#     file MetricsOutput  <strcat(caseDirPaths[i], "metrics.csv")>;
+#     string extractOutDir = strcat(outDir,"png/",i,"/");
+#     file fextractPng[]	 <filesys_mapper;location=extractOutDir>;	
+# 	file fRunOut       <strcat(logsDir, "extractRun", i, ".out")>;
+# 	file fRunErr       <strcat(errorsDir, "extractRun", i ,".err")>;
     
-    (MetricsOutput, fextractPng, fRunOut, fRunErr) = runSimExtractMetrics(fOpenCaseTar, metrics2extract,
-                                                                                extractOutDir, utils);
-}
+#     (MetricsOutput, fextractPng, fRunOut, fRunErr) = runSimExtractMetrics(fOpenCaseTar, metrics2extract,
+#                                                                                 extractOutDir, utils);
+# }
 
 

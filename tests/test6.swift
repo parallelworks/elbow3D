@@ -31,8 +31,8 @@ app (file cases, file[] simFileParams) writeCaseParamFiles (file sweepParams, st
 }
 
 app (file fcaseTar, file ferr, file fout) prepareCase (file geomScript, file utils[], 
-                                                              file fsimParams, string caseDirPath, 
-                                                              file writeBlockMeshScript, file fFoamCase) {
+                                                       file fsimParams, string caseDirPath, 
+                                                       file writeBlockMeshScript, file fFoamCase) {
     makeGeom filename(geomScript) filename(fsimParams) filename(fFoamCase) 
              caseDirPath filename(fout) filename(ferr);
     makeMesh filename(fsimParams) filename(fFoamCase) caseDirPath filename(writeBlockMeshScript) 

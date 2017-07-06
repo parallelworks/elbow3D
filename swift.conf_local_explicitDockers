@@ -225,19 +225,29 @@ site.local {
 	filesystem {
 		type: local
 	}
-	
+    staging: local	
 	workDirectory: "swiftwork"
 	
 	app.ALL {
-        env.SALOMEPATH: "/home/marmar/programs-local/SALOME-8.2.0-UB14.04/"
-        env.PARAVIEWPATH: "/home/marmar/programs-local/ParaView-5.3.0-Qt5-OpenGL2-MPI-Linux-64bit/bin/"
         env.OPENFOAMPATH: "/opt/openfoam4/"
 		executable: "*"
 	}
-    app.salome {
-        executable: "/home/marmar/programs-local/SALOME-8.2.0-UB14.04/salome"
-        maxWallTime: "01:00"
-    }
+	app.makeGeom {
+        executable: ${env.PWD}"/utils/makeGeom.sh"
+		env.embeddedDocker:"true"
+	}
+	app.makeMesh {
+        executable: ${env.PWD}"/utils/makeMesh.sh"
+		env.embeddedDocker:"true"
+	}
+	app.runSim {
+		executable: ${env.PWD}"/utils/runSim.sh"
+		env.embeddedDocker:"true"
+	}
+	app.PVExtract {
+		executable: ${env.PWD}"/utils/PVExtract.sh"
+		env.embeddedDocker:"true"
+	}
 
 }
 

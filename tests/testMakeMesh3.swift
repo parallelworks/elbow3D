@@ -12,6 +12,7 @@ file fsweepParams		    <strcat("inputs/",sweepParamsFileName)>;
 string outDir               = "outputs/";
 string errorsDir            = strcat(outDir, "errorFiles/");
 string logsDir              = strcat(outDir, "logFiles/");
+string salPortsDir          = strcat(logsDir, "salPortNums/");
 string simFilesDir          = strcat(outDir, "simParamFiles/");
 string caseDirs         = strcat(outDir, "case"); 
 
@@ -23,6 +24,13 @@ file writeBlockMeshScript   <"utils/writeBlockMeshDictFile.py">;
 
 file utils[] 		        <filesys_mapper;location="utils", pattern="?*.*">;
 
+# ------- Funciton definitions--------------#
+
+(string nameNoSuffix) trimSuffix (string nameWithSuffix){
+   int suffixStartLoc = lastIndexOf(nameWithSuffix, ".", -1);
+   nameNoSuffix = substring(nameWithSuffix, 0, suffixStartLoc); 
+}
+
 # ------ APP DEFINITIONS --------------------#
 
 app (file cases, file[] simFileParams) writeCaseParamFiles (file sweepParams, string simFilesDir, file[] utils) {
@@ -30,13 +38,18 @@ app (file cases, file[] simFileParams) writeCaseParamFiles (file sweepParams, st
 	python "utils/writeSimParamFiles.py" filename(cases) simFilesDir "caseParamFile";
 }
 
-app (file fcaseTar, file ferr, file fout) prepareCase (file geomScript, file utils[], 
+app (file fcaseTar, file ferr, file fout, file salPort) prepareCase (file geomScript, file utils[], 
                                                               file fsimParams, string caseDirPath, 
                                                               file writeBlockMeshScript, file fFoamCase) {
-    makeGeom filename(geomScript) filename(fsimParams) filename(fFoamCase) 
+    makeGeom filename(salPort) filename(geomScript) filename(fsimParams) filename(fFoamCase) 
              caseDirPath filename(fout) filename(ferr);
     makeMesh filename(fsimParams) filename(fFoamCase) caseDirPath filename(writeBlockMeshScript) 
              filename(fout) filename(ferr);
+
+}
+
+app (file ferr, file fout) killSalomeInstance (file[] fmeshes, file salPort, file utils[]){
+    killSalome filename(salPort)  stderr=filename(ferr) stdout=filename(fout); 
 }
 
 app (file MetricsOutput, file[] fpngs, file fOut, file fErr) runSimExtractMetrics (file fOpenCaseTar, 
@@ -59,27 +72,38 @@ file[] simFileParams        <filesys_mapper; location = simFilesDir>;
 
 
 file[] fallFoamCaseDirs;
+file[] salPortFiles;
 string[] caseDirPaths;
 foreach fsimParams,i in simFileParams{
+    file fsalPortLog     <strcat(salPortsDir, "salomePort", i, ".log")>;
     file meshErr         <strcat(errorsDir, "mesh", i, ".err")>;                          
     file meshOut         <strcat(logsDir, "mesh", i, ".out")>;                          
     caseDirPaths[i] = strcat(caseDirs, i, "/");
     file fcaseTar     <strcat(caseDirPaths[i], "/openFoamCase.tar")>;
-    (fcaseTar, meshErr, meshOut) = prepareCase(geomScript, utils, fsimParams, caseDirPaths[i],
+    (fcaseTar, meshErr, meshOut, fsalPortLog) = prepareCase(geomScript, utils, fsimParams, caseDirPaths[i],
                                                             writeBlockMeshScript, fFoamCase);
     fallFoamCaseDirs[i] = fcaseTar;
+    salPortFiles[i] = fsalPortLog;
 }
 
-# Run openFoam and extract metrics for each case
-foreach fOpenCaseTar,i in fallFoamCaseDirs{
-    file MetricsOutput  <strcat(caseDirPaths[i], "metrics.csv")>;
-    string extractOutDir = strcat(outDir,"png/",i,"/");
-    file fextractPng[]	 <filesys_mapper;location=extractOutDir>;	
-	file fRunOut       <strcat(logsDir, "extractRun", i, ".out")>;
-	file fRunErr       <strcat(errorsDir, "extractRun", i ,".err")>;
-    
-    (MetricsOutput, fextractPng, fRunOut, fRunErr) = runSimExtractMetrics(fOpenCaseTar, metrics2extract,
-                                                                                extractOutDir, utils);
+
+# Terminate Salome instances after done with generating all mesh files
+foreach fsalPort,i in salPortFiles{
+    file salKillErr     <strcat(errorsDir, "salomeKill",i,".err")>;                          
+    file salKillOut     <strcat(logsDir, "salomeKill",i,".out")>;                          
+    (salKillErr, salKillOut) =  killSalomeInstance(fallFoamCaseDirs,  fsalPort, utils);
 }
+
+# # Run openFoam and extract metrics for each case
+# foreach fOpenCaseTar,i in fallFoamCaseDirs{
+#     file MetricsOutput  <strcat(caseDirPaths[i], "metrics.csv")>;
+#     string extractOutDir = strcat(outDir,"png/",i,"/");
+#     file fextractPng[]	 <filesys_mapper;location=extractOutDir>;	
+# 	file fRunOut       <strcat(logsDir, "extractRun", i, ".out")>;
+# 	file fRunErr       <strcat(errorsDir, "extractRun", i ,".err")>;
+    
+#     (MetricsOutput, fextractPng, fRunOut, fRunErr) = runSimExtractMetrics(fOpenCaseTar, metrics2extract,
+#                                                                                 extractOutDir, utils);
+# }
 
 

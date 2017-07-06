@@ -1,0 +1,42 @@
+sites: [linuxpool]
+
+site.linuxpool {
+ execution {
+    type: "coaster-persistent"
+    //URL: "http://go.parallel.works:9034"
+    URL: "http://localhost:4030"
+ }
+ staging: local
+ initialParallelTasks: 999999
+ maxParallelTasks: 999999
+ workDirectory: "/tmp/swiftwork"
+ app.ALL {
+    env {
+
+    }
+    executable: "*"
+ }
+ app.bash {
+    maxWallTime: "48:00:00"
+    exclusive: true
+    options {
+       docker {
+         image: "parallelworks/openfoam4"
+         jobDirMountPoint: "/scratch"
+         registry: "docker.io"
+         alwaysPull: false
+       }
+    }
+ }
+ app.python {
+    executable: "python"
+    maxWallTime: "00:10:00"
+    exclusive: true
+ }
+}
+
+lazyErrors: true
+executionRetries: 0
+keepSiteDir: false
+providerStagingPinSwiftFiles: false
+alwaysTransferWrapperLog: false

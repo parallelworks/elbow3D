@@ -6,7 +6,7 @@ import data_IO
 import sys
 from collections import OrderedDict
 
-
+# Need the tool surfaceCheck openFoam for this function
 def getBoundingBoxFromStl(stlFileAddress):
     print(os.getcwd())
     surfOut = subprocess.check_output(["surfaceCheck", stlFileAddress, "-verbose"])
