@@ -4,7 +4,7 @@ type file;
 
 # ------ INPUT / OUTPUT DEFINITIONS -------#
 
-string sweepParamsFileName  = arg("sweepParamFile", "sweepParams.run");
+string sweepParamsFileName  = arg("sweepParamFile", "sweepParams_fast2.run");
 
 file fsweepParams		    <strcat("inputs/",sweepParamsFileName)>;
 
@@ -22,6 +22,9 @@ file fFoamCase              <"inputs/openFoamCase.tar">;
 file writeBlockMeshScript   <"utils/writeBlockMeshDictFile.py">;
 
 file utils[] 		        <filesys_mapper;location="utils", pattern="?*.*">;
+
+string runPath = getEnv("PWD");
+
 
 # ------ APP DEFINITIONS --------------------#
 
@@ -49,6 +52,7 @@ app (file MetricsOutput, file[] fpngs, file fOut, file fErr) runSimExtractMetric
 
 }
 
+#app (file outcsv, file outhtml, file so, file se) process4DesignExplorer (file[] txts, string rpath, file u[],file caselist))
 
 #----------------workflow-------------------#
 
@@ -56,7 +60,6 @@ app (file MetricsOutput, file[] fpngs, file fOut, file fErr) runSimExtractMetric
 file caseFile 	            <strcat(outDir,"cases.list")>;
 file[] simFileParams        <filesys_mapper; location = simFilesDir>;
 (caseFile, simFileParams) = writeCaseParamFiles(fsweepParams, simFilesDir, utils);
-
 
 file[] fallFoamCaseDirs;
 string[] caseDirPaths;
@@ -71,15 +74,17 @@ foreach fsimParams,i in simFileParams{
 }
 
 # Run openFoam and extract metrics for each case
+file [][] allCasesPngs;
 foreach fOpenCaseTar,i in fallFoamCaseDirs{
     file MetricsOutput  <strcat(caseDirPaths[i], "metrics.csv")>;
     string extractOutDir = strcat(outDir,"png/",i,"/");
-    file fextractPng[]	 <filesys_mapper;location=extractOutDir>;	
+    file fcasePngs[]	 <filesys_mapper;location=extractOutDir>;	
 	file fRunOut       <strcat(logsDir, "extractRun", i, ".out")>;
 	file fRunErr       <strcat(errorsDir, "extractRun", i ,".err")>;
     
-    (MetricsOutput, fextractPng, fRunOut, fRunErr) = runSimExtractMetrics(fOpenCaseTar, metrics2extract,
+    (MetricsOutput, fcasePngs, fRunOut, fRunErr) = runSimExtractMetrics(fOpenCaseTar, metrics2extract,
                                                                                 extractOutDir, utils);
+    allCasesPngs[i] = fcasePngs;                                                                               
 }
 
 

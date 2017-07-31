@@ -27,14 +27,14 @@ boundaryField
     {
         type surfaceNormalFixedValue;
         value uniform ( 0.0 0.0 0.0 );
-        refValue uniform -@@Inlet1_Velocity@@; 
+        refValue uniform @@Inlet1_Velocity@@; 
     }
 
     velocity-inlet-2
     {
         type surfaceNormalFixedValue;
         value uniform ( 0.0 0.0 0.0 );
-        refValue uniform -@@Inlet2_Velocity@@; 
+        refValue uniform @@Inlet2_Velocity@@; 
     }
 
     walls

@@ -1,13 +1,13 @@
 R;8
 r;2
 L1;32
-L2;32 40
+L2;32
 Rcurve;24
 xIn2;54.5
 yIn2;-4.5
 Inlet1_Velocity;-1.0
-Inlet2_Velocity;-2.0 -4.0
-endTime;5.0
+Inlet2_Velocity;2.0
+endTime;10.0
 writeInterval;1.0
 meshMinLevel;0
 meshMaxLevel;1

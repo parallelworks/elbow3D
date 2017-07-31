@@ -124,6 +124,12 @@ def read_str_from_strList(strList, flag_str, delimiter=None,
     return data
 
 
+def read_floats_from_string(str2read, delimiter=None):
+    strList = str2read.split(delimiter)
+    floatList = [float(i) for i in strList]
+    return floatList
+
+
 def open_file(file_name, open_mode="r"):
     if open_mode == "w":
         if not os.path.exists(os.path.dirname(file_name)):
@@ -140,3 +146,10 @@ def tarDirectory(output_filename, source_dir, compressMode="w"):
     with tarfile.open(output_filename, compressMode) as tar:
         tar.add(source_dir, arcname=os.path.basename(source_dir))
 
+
+def setOptionalSysArgs(args, paramDefaultValue, argNumber):
+    if len(args) >= (argNumber+1):
+        param = args[argNumber]
+    else:
+        param = paramDefaultValue
+    return param

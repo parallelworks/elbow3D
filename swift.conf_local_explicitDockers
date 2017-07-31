@@ -227,6 +227,8 @@ site.local {
 	}
     staging: local	
 	workDirectory: "swiftwork"
+    initialParallelTasks: 5
+   	maxParallelTasks:5
 	
 	app.ALL {
         env.OPENFOAMPATH: "/opt/openfoam4/"
