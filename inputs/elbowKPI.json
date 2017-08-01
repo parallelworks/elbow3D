@@ -34,7 +34,7 @@
     "ClipUy": {
         "opacity": "1", 
         "invertcolor": "0", 
-        "min": "-2", 
+        "min": "-4", 
         "max": "2", 
         "image": "top", 
         "colorscale": "Blue to Red Rainbow", 

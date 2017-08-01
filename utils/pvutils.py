@@ -117,6 +117,68 @@ def getdatarange(datasource, kpifld, kpifldcomp):
     return datarange
 
 
+def extractStatsOld(d, kpi, kpifield, kpiComp, kpitype, fp_csv_metrics, ave=[]):
+    datarange = getdatarange(d, kpifield, kpiComp)
+    if kpitype == "Probe":
+        average=(datarange[0]+datarange[1])/2
+    elif kpitype == "Line":
+        average=ave
+    elif kpitype == "Slice":
+        # get kpi field value and area - average = value/area
+        integrateVariables = IntegrateVariables(Input=d)
+        average = getdatarange(integrateVariables, kpifield, kpiComp)[0]\
+                 / integrateVariables.CellData['Area'].GetRange()[0]
+    elif kpitype == "Volume" or kpitype == "Clip":
+        integrateVariables = IntegrateVariables(Input=d)
+        average = getdatarange(integrateVariables, kpifield, kpiComp)[0]\
+                  / integrateVariables.CellData['Volume'].GetRange()[0]
+
+    fp_csv_metrics.write(",".join([kpi, str(average), str(datarange[0]),str(datarange[1])]) + "\n")
+
+
+def extractStats(dataSource, kpi, kpifield, kpiComp, kpitype, fp_csv_metrics):
+    # If kpifield is a vector, add a calculater on top and extract the component of the vector
+    # as a scalar
+    arrayInfo = dataSource.PointData[kpifield]
+    if isfldScalar(arrayInfo):
+        statVarName = kpifield
+    else:
+        # create a new 'Calculator'
+        statVarName = kpifield + '_' + kpiComp
+        calc1 = Calculator(Input=dataSource)
+        calc1.ResultArrayName = statVarName
+        if kpiComp == 'Magnitude':
+            calc1.Function = 'mag('+kpifield+')'
+        else:
+            calc1.Function = calc1.ResultArrayName
+        UpdatePipeline()
+        dataSource = calc1
+
+    # create a new 'Descriptive Statistics'
+    dStats = DescriptiveStatistics(Input=dataSource, ModelInput=None)
+    print(statVarName)
+    dStats.VariablesofInterest = [statVarName]
+    UpdatePipeline()
+
+    dStatsDataInfo = dStats.GetDataInformation()
+    dStatsStatsInfo = dStatsDataInfo.GetRowDataInformation()
+    numStats = dStatsDataInfo.GetRowDataInformation().GetNumberOfArrays()
+
+    for iStat in range(numStats):
+        statName = dStatsStatsInfo.GetArrayInformation(iStat).GetName()
+        statValue = dStatsStatsInfo.GetArrayInformation(iStat).GetComponentRange(0)[0]
+        if  statName == 'Maximum':
+            maxaximum = statValue
+        elif statName == 'Minimum' :
+            minimum = statValue
+        elif statName == 'Mean':
+            average = statValue
+        elif statName == 'Standard Deviation':
+            stanDev = statValue
+
+    fp_csv_metrics.write(",".join([kpi, str(average), str(minimum), str(maxaximum), str(stanDev)]) + "\n")
+
+
 def correctfieldcomponent(datasource, metrichash):
     """
     Set "fieldComponent" to "Magnitude" if the component of vector/tensor fields is not given. For scalar fields set 
@@ -177,7 +239,11 @@ def getTimeSteps():
     # update animation scene based on data timesteps
     animationScene1.UpdateAnimationUsingDataTimeSteps()
 
-    timeSteps = list(animationScene1.TimeKeeper.TimestepValues)
+    timeSteps = []
+    if type(animationScene1.TimeKeeper.TimestepValues)== int or type(animationScene1.TimeKeeper.TimestepValues)== float:
+        timeSteps.append(animationScene1.TimeKeeper.TimestepValues)       
+    else:
+        timeSteps = list(animationScene1.TimeKeeper.TimestepValues)
 
     return timeSteps
 
@@ -212,7 +278,6 @@ def initRenderView (dataReader, viewSize, backgroundColor):
     return renderView1, readerDisplay
 
 
-
 def colorMetric(d, metrichash):
     display = GetDisplayProperties(d)
 
@@ -240,26 +305,46 @@ def colorMetric(d, metrichash):
         ctf.NumberOfTableValues = int(metrichash["discretecolors"])
     else:
         ctf.Discretize = 0
-    GetScalarBar(ctf).TitleColor = [0,0,0]
-    GetScalarBar(ctf).LabelColor = [0,0,0]
-    GetScalarBar(ctf).Orientation = "Horizontal"
-    
+
+    renderView1 = GetActiveViewOrCreate('RenderView')
+    ctfColorBar = GetScalarBar(ctf, renderView1)
+
+    ctfColorBar.Orientation = "Horizontal"
+
+    # Properties modified on uLUTColorBar
+    if 'barTitle' in metrichash:
+        ctfColorBar.Title = metrichash["barTitle"]
+    if 'ComponentTitle' in metrichash:
+        ctfColorBar.ComponentTitle = metrichash["ComponentTitle"]
+    if 'FontColor' in metrichash:
+        ctfColorBar.TitleColor = data_IO.read_floats_from_string(metrichash["FontColor"])
+        ctfColorBar.LabelColor = data_IO.read_floats_from_string(metrichash["FontColor"])
+    else:
+        ctfColorBar.TitleColor = [0, 0, 0]
+        ctfColorBar.LabelColor = [0, 0, 0]
+    if 'FontSize' in metrichash:
+        ctfColorBar.TitleFontSize = int(metrichash["FontSize"])
+        ctfColorBar.LabelFontSize = int(metrichash["FontSize"])
+    if 'LabelFormat' in metrichash:
+        ctfColorBar.LabelFormat = metrichash["LabelFormat"]
+        ctfColorBar.RangeLabelFormat = metrichash["LabelFormat"]
+
     imgtype=metrichash['image'].split("_")[0]
     PVversion = getParaviewVersion()
     if (imgtype!="iso"):
         # center
         if PVversion < 5.04:
-            GetScalarBar(ctf).Position = [0.25,0.05]
-            GetScalarBar(ctf).Position2 = [0.5,0] # no such property in PV 5.04
+            ctfColorBar.Position = [0.25,0.05]
+            ctfColorBar.Position2 = [0.5,0] # no such property in PV 5.04
         else:
-            GetScalarBar(ctf).WindowLocation = 'LowerCenter'
+            ctfColorBar.WindowLocation = 'LowerCenter'
     else:
         # left
         if PVversion < 5.04:
-            GetScalarBar(ctf).Position = [0.05,0.025]
-            GetScalarBar(ctf).Position2 = [0.4,0] # no such property in PV 5.04
+            ctfColorBar.Position = [0.05,0.025]
+            ctfColorBar.Position2 = [0.4,0] # no such property in PV 5.04
         else:
-            GetScalarBar(ctf).WindowLocation = 'LowerLeftCorner'
+            ctfColorBar.WindowLocation = 'LowerLeftCorner'
 
     #if individualImages == False:
     #    display.SetScalarBarVisibility(renderView1, False)
@@ -517,7 +602,7 @@ def createLine(metrichash, kpi, data_reader, outputDir="."):
     return l, ave
 
 
-def adjustCamera(view, renderView1):
+def adjustCamera(view, renderView1, metrichash):
     camera=GetActiveCamera()
     if view == "iso":
         camera.SetFocalPoint(0, 0, 0)
@@ -548,12 +633,19 @@ def adjustCamera(view, renderView1):
         camera.SetFocalPoint(0,0,0)
         camera.SetPosition(0,0,1)
         renderView1.ResetCamera()
-#        camera.Roll(90)
+        #        camera.Roll(90)
     elif view == "-Z" or view == "-z" or view == "bottom": 
         camera.SetFocalPoint(0,0,0)
         camera.SetPosition(0,0,-1)
         renderView1.ResetCamera()
-#       camera.Roll(-90)
+        #       camera.Roll(-90)
+    elif view == "customize":
+        renderView1.InteractionMode = '3D'
+        renderView1.CameraPosition   = data_IO.read_floats_from_string(metrichash["CameraPosition"])
+        renderView1.CameraFocalPoint = data_IO.read_floats_from_string(metrichash["CameraFocalPoint"])
+        renderView1.CameraViewUp = data_IO.read_floats_from_string(metrichash["CameraViewUp"])
+        renderView1.CameraParallelScale = float(metrichash["CameraParallelScale"])
+        renderView1.CameraParallelProjection = int(metrichash["CameraParallelProjection"])
 
 
 def makeAnimation(outputDir, kpi, magnification, deleteFrames=True):
