@@ -1,7 +1,7 @@
 #!/bin/bash 
 paramsFile=$1
 
-foamCaseTar=$2
+faomCaseDirPath=$2
 caseDirPath=$3
 
 writeBlockMeshDictScript=$4 
@@ -23,7 +23,7 @@ fOutDir=$(dirname "${fOut}")
 mkdir -p $fOutDir
 
 # Copy and extract openFoam case files
-foamDirName=$(basename "$foamCaseTar")
+foamDirName=$(basename "$faomCaseDirPath")
 foamDirName="${foamDirName%%.*}"
 
 meshDir=$caseDirPath/$foamDirName/constant/triSurface/

@@ -17,8 +17,9 @@ string caseDirs             = strcat(outDir, "case");
 
 # Script files and utilities
 file geomScript             <"utils/elbow3D_SalomeGeom.py">;
-file metrics2extract        <"inputs/elbowKPI.json">;
-file fFoamCase              <"inputs/openFoamCase.tar">;
+file metrics2extract        <"utils/elbowKPI.json">;
+string fFoamCaseRootPath    = "openFoamCase";
+file[] fFoamCase            <Ext; exec = "utils/mapper.sh", root = fFoamCaseRootPath>;
 file writeBlockMeshScript   <"utils/writeBlockMeshDictFile.py">;
 
 file utils[] 		        <filesys_mapper;location="utils", pattern="?*.*">;
@@ -33,9 +34,9 @@ app (file cases, file[] simFileParams) writeCaseParamFiles (file sweepParams, st
     bash "utils/prepInputs.sh"  filename(sweepParams) filename(cases) simFilesDir "caseParamFile";
 }
 
-app (file fcaseTar, file ferr, file fout) prepareCase (file geomScript, file utils[], file fsimParams, string caseDirPath, file writeBlockMeshScript, file fFoamCase) {
-    bash "utils/makeGeom.sh"  filename(geomScript) filename(fsimParams) filename(fFoamCase) caseDirPath filename(fout) filename(ferr);
-    bash "utils/makeMesh.sh" filename(fsimParams) filename(fFoamCase) caseDirPath filename(writeBlockMeshScript) filename(fout) filename(ferr);
+app (file fcaseTar, file ferr, file fout) prepareCase (file geomScript, file utils[], file fsimParams, string caseDirPath, file writeBlockMeshScript, string fFoamCaseRootPath, file[] fFoamCase) {
+    bash "utils/makeGeom.sh"  filename(geomScript) filename(fsimParams) fFoamCaseRootPath caseDirPath filename(fout) filename(ferr);
+    bash "utils/makeMesh.sh" filename(fsimParams) fFoamCaseRootPath caseDirPath filename(writeBlockMeshScript) filename(fout) filename(ferr);
 }
 
 app (file MetricsOutput, file[] fpngs, file fOut, file fErr) runSimExtractMetrics (file fOpenCaseTar, file metrics2extract, string extractOutDir, file utils[], file mexdex[]){
@@ -58,7 +59,7 @@ foreach fsimParams,i in simFileParams{
     file meshOut         <strcat(logsDir, "mesh", i, ".out")>;
     caseDirPaths[i] = strcat(caseDirs, i, "/");
     file fcaseTar     <strcat(caseDirPaths[i], "/openFoamCase.tar")>;
-    (fcaseTar, meshErr, meshOut) = prepareCase(geomScript, utils, fsimParams, caseDirPaths[i], writeBlockMeshScript, fFoamCase);
+    (fcaseTar, meshErr, meshOut) = prepareCase(geomScript, utils, fsimParams, caseDirPaths[i], writeBlockMeshScript, fFoamCaseRootPath, fFoamCase);
     fallFoamCaseDirs[i] = fcaseTar;
 }
 

@@ -3,13 +3,14 @@
 geomScript=$1
 paramsFile=$2
 
-foamCaseTar=$3
+faomCaseDirPath=$3
 caseDirPath=$4
 
 
 fOut=$5
 fErr=$6
 
+echo $@  >> $fOut
 
 WORK_DIR=$(pwd)
 errDir=$(dirname "${fErr}")
@@ -25,13 +26,11 @@ fi
 
 
 # Copy and extract openFoam case files
-foamDirName=$(basename "$foamCaseTar")
+foamDirName=$(basename "$faomCaseDirPath")
 foamDirName="${foamDirName%%.*}"
 
 mkdir -p $caseDirPath
-cp $foamCaseTar $caseDirPath
-tar -xf $caseDirPath/$foamDirName.tar -C $caseDirPath
-rm $caseDirPath/$foamDirName.tar
+cp -r $faomCaseDirPath $caseDirPath
 meshDir=$caseDirPath/$foamDirName/constant/triSurface/
 #sysDir=$caseDirPath/$foamDirName/system/
 
@@ -62,9 +61,6 @@ chmod +x makeGeomRun.sh
 
 $run_command makeGeomRun.sh 1>>$fOut 2>>$fErr 
 
-# cd $caseDirPath/
-# tar -cf $foamDirName.tar $foamDirName
-# cd $WORK_DIR
 
 
 
