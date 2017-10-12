@@ -1,12 +1,15 @@
 #!/bin/bash 
 openCaseTarAddress=$1 
+openCaseResultsTarAddress=$2
 
-desiredMetricsFile=$2
-pvOutputDir=$3
-outputMetrics=$4
+desiredMetricsFile=$3
+pvOutputDir=$4
+outputMetrics=$5
+saveSimResults=$6
 
-fOut=$5
-fErr=$6
+fOut=$7
+fErr=$8
+
 
 if [ "$embeddedDocker" = true ] ; then
 #	run_command="docker run --rm -i -v `pwd`:/scratch -w /scratch -u $(id -u):$(id -g) parallelworks/paraview:v5_4u_imgmagick   /bin/bash" 
@@ -56,3 +59,13 @@ printf '\n------------\n' >> $fOut
 chmod +x pvpythonRun.sh
 
 $run_command pvpythonRun.sh  1>>$fOut 2>>$fErr
+
+echo saveSimResults= >> $fOut
+echo $saveSimResults >> $fOut
+if [ "$saveSimResults" = true ] ; then
+	cd $caseDirPath/
+	rm $openFoamTar
+	tar -cf $foamDirName.tar $foamDirName
+	cd $WORK_DIR
+fi
+cp $caseDirPath/$foamDirName.tar $openCaseResultsTarAddress

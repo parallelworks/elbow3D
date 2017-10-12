@@ -7,6 +7,8 @@ type file;
 string sweepParamsFileName  = arg("sweepParamFile", "sweepParams_fast2.run");
 
 file fsweepParams		    <strcat("inputs/",sweepParamsFileName)>;
+string saveSimResults  = arg("saveSimResults","false");
+
 
 # directory definitions
 string outDir               = "outputs/";
@@ -39,9 +41,9 @@ app (file fcaseTar, file ferr, file fout) prepareCase (file geomScript, file uti
     bash "utils/makeMesh.sh" filename(fsimParams) fFoamCaseRootPath caseDirPath filename(writeBlockMeshScript) filename(fout) filename(ferr);
 }
 
-app (file MetricsOutput, file[] fpngs, file fOut, file fErr) runSimExtractMetrics (file fOpenCaseTar, file metrics2extract, string extractOutDir, file utils[], file mexdex[]){
+app (file MetricsOutput, file[] fpngs, file fRawResultsTar, file fOut, file fErr) runSimExtractMetrics (file fOpenCaseTar, file metrics2extract, string extractOutDir, string saveSimResults, file utils[], file mexdex[]){
     bash "utils/runSim.sh"  filename(fOpenCaseTar) filename(fOut) filename(fErr);
-    bash "utils/PVExtract.sh" filename(fOpenCaseTar) filename(metrics2extract) extractOutDir filename(MetricsOutput) filename(fOut) filename(fErr);
+    bash "utils/PVExtract.sh" filename(fOpenCaseTar) filename(fRawResultsTar) filename(metrics2extract) extractOutDir filename(MetricsOutput) saveSimResults filename(fOut) filename(fErr);
 }
 
 #----------------workflow-------------------#
@@ -71,7 +73,7 @@ foreach fOpenCaseTar,i in fallFoamCaseDirs{
     file fcasePngs[]	 <filesys_mapper;location=extractOutDir>;
 	file fRunOut       <strcat(logsDir, "extractRun", i, ".out")>;
 	file fRunErr       <strcat(errorsDir, "extractRun", i ,".err")>;
-    
-    (MetricsOutput, fcasePngs, fRunOut, fRunErr) = runSimExtractMetrics(fOpenCaseTar, metrics2extract, extractOutDir, utils, mexdex);
+    file caseRawResults <strcat(caseDirPaths[i],"/caseResults.tar")>;
+    (MetricsOutput, fcasePngs, caseRawResults, fRunOut, fRunErr) = runSimExtractMetrics(fOpenCaseTar, metrics2extract, extractOutDir, saveSimResults, utils, mexdex);
     allCasesPngs[i] = fcasePngs;
 }
