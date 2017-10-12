@@ -9,8 +9,8 @@ fOut=$5
 fErr=$6
 
 if [ "$embeddedDocker" = true ] ; then
-#	run_command="docker run --rm -i -v `pwd`:/scratch -w /scratch -u $(id -u):$(id -g) marmarm/paraview:v5_4u_imgmagick   /bin/bash" 
-	run_command="docker run --rm -i -v `pwd`:/scratch -w /scratch -u 0:0 marmarm/paraview:v5_4u_imgmagick   /bin/bash" 
+#	run_command="docker run --rm -i -v `pwd`:/scratch -w /scratch -u $(id -u):$(id -g) parallelworks/paraview:v5_4u_imgmagick   /bin/bash" 
+	run_command="docker run --rm -i -v `pwd`:/scratch -w /scratch -u 0:0 parallelworks/paraview:v5_4u_imgmagick   /bin/bash" 
 	PARAVIEWPATH=""
 else
     run_command="/bin/bash"

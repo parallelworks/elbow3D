@@ -6,7 +6,7 @@ fErr=$3
 
 
 if [ "$embeddedDocker" = true ] ; then
-	run_command="docker run --rm -i -v `pwd`:/scratch -w /scratch -u $(id -u):$(id -g) marmarm/openfoam:v4_1 /bin/bash" 
+	run_command="docker run --rm -i -v `pwd`:/scratch -w /scratch -u $(id -u):$(id -g) parallelworks/openfoam:v4_1 /bin/bash" 
 else
     run_command="/bin/bash"
 fi

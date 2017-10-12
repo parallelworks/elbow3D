@@ -18,7 +18,7 @@ fOutDir=$(dirname "${fOut}")
 mkdir -p $fOutDir
 
 if [ "$embeddedDocker" = true ] ; then
-    run_command="docker run --rm  -i -v `pwd`:/scratch -w /scratch -u $(id -u):$(id -g) marmarm/salome:v8_2u /bin/bash"
+    run_command="docker run --rm  -i -v `pwd`:/scratch -w /scratch -u $(id -u):$(id -g) parallelworks/salome:v8_2u /bin/bash"
 else
     run_command="/bin/bash"
 fi
