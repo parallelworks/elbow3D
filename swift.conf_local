@@ -128,7 +128,7 @@ fileOperationsThrottle=8
 # Default: false
 #
 
-keepSiteDir=false
+keepSiteDir=true
 
 # number of time a job will be retried if it fails (giving a maximum of
 # 1 + execution.retries attempts at execution)
@@ -234,24 +234,8 @@ site.local {
         env.OPENFOAMPATH: "/opt/openfoam4/"
         env.SALOMEPATH: "/home/marmar/programs-local/SALOME-8.2.0-UB14.04/"
 		executable: "*"
+        env.embeddedDocker:"false"      
 	}
-	app.makeGeom {
-        executable: ${env.PWD}"/utils/makeGeom.sh"
-		env.embeddedDocker:"false"
-	}
-	app.makeMesh {
-        executable: ${env.PWD}"/utils/makeMesh.sh"
-		env.embeddedDocker:"false"
-	}
-	app.runSim {
-		executable: ${env.PWD}"/utils/runSim.sh"
-		env.embeddedDocker:"false"
-	}
-	app.PVExtract {
-		executable: ${env.PWD}"/utils/PVExtract.sh"
-		env.embeddedDocker:"false"
-	}
-
 }
 
 sites: [local]

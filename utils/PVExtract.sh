@@ -9,11 +9,14 @@ fOut=$5
 fErr=$6
 
 if [ "$embeddedDocker" = true ] ; then
-	run_command="docker run --rm -i -v `pwd`:/scratch -w /scratch -u $(id -u):$(id -g) marmarm/paraview:v5_4u_imgmagick   /bin/bash" 
+#	run_command="docker run --rm -i -v `pwd`:/scratch -w /scratch -u $(id -u):$(id -g) marmarm/paraview:v5_4u_imgmagick   /bin/bash" 
+	run_command="docker run --rm -i -v `pwd`:/scratch -w /scratch -u 0:0 marmarm/paraview:v5_4u_imgmagick   /bin/bash" 
+	PARAVIEWPATH=""
 else
     run_command="/bin/bash"
 fi
 
+echo $run_command
 
 
 errDir=$(dirname "${fErr}")
@@ -23,7 +26,7 @@ mkdir -p $fOutDir
 
 WORK_DIR=$(pwd)
 
-pvpythonExtractScript=utils/extract.py
+pvpythonExtractScript=mexdex/extract.py
 
 caseDirPath=$(dirname "${openCaseTarAddress}")
 openFoamTar=$(basename "$openCaseTarAddress")
@@ -34,8 +37,9 @@ controlDictFile=$caseDirPath/$foamDirName/system/controlDict
 if [ "$embeddedDocker" = true ] ; then
  	cp $pvpythonExtractScript pvpythonExtractScript_localCopy.py
 	pvpythonExtractScript=pvpythonExtractScript_localCopy.py
-	cp utils/data_IO.py . 
-	cp utils/pvutils.py .
+	cp mexdex/data_IO.py . 
+	cp mexdex/pvutils.py .
+	cp mexdex/metricsJsonUtils.py .
 fi 
 ####### !!!
 

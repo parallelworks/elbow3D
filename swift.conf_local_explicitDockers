@@ -232,25 +232,9 @@ site.local {
 	
 	app.ALL {
         env.OPENFOAMPATH: "/opt/openfoam4/"
+		env.embeddedDocker:"true"
 		executable: "*"
 	}
-	app.makeGeom {
-        executable: ${env.PWD}"/utils/makeGeom.sh"
-		env.embeddedDocker:"true"
-	}
-	app.makeMesh {
-        executable: ${env.PWD}"/utils/makeMesh.sh"
-		env.embeddedDocker:"true"
-	}
-	app.runSim {
-		executable: ${env.PWD}"/utils/runSim.sh"
-		env.embeddedDocker:"true"
-	}
-	app.PVExtract {
-		executable: ${env.PWD}"/utils/PVExtract.sh"
-		env.embeddedDocker:"true"
-	}
-
 }
 
 sites: [local]
