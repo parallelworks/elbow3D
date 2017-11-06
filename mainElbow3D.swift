@@ -4,7 +4,7 @@ type file;
 
 # ------ INPUT / OUTPUT DEFINITIONS -------#
 
-string sweepParamsFileName  = arg("sweepParamFile", "sweepParams_fast2.run");
+string sweepParamsFileName  = arg("sweepParamFile", "sweepParams_fast2_PW.run");
 
 file fsweepParams		    <strcat("inputs/",sweepParamsFileName)>;
 string saveSimResults  = arg("saveSimResults","false");
