@@ -35,8 +35,8 @@ string runPath = getEnv("PWD");
 
 # ------ APP DEFINITIONS --------------------#
 
-app (file cases, file[] simFileParams) writeCaseParamFiles (file sweepParams, string simFilesDir, file[] utils, file[] mexdex) {
-    bash "utils/prepInputs.sh"  filename(sweepParams) filename(cases) simFilesDir "caseParamFile";
+app (file cases, file[] simFileParams) writeCaseParamFiles (file sweepParams, string simFilesDir, file[] mexdex) {
+    bash "mexdex/prepInputs.sh"  filename(sweepParams) filename(cases) simFilesDir "caseParamFile";
 }
 
 app (file fcaseTar, file ferr, file fout) prepareCase (file geomScript, file utils[], file fsimParams, string caseDirPath, file writeBlockMeshScript, string fFoamCaseRootPath, file[] fFoamCase) {
@@ -59,7 +59,7 @@ app (file outcsv, file outhtml, file so, file se) designExplorer (string runPath
 # Read parameters from the sweepParams file and write to case files
 file caseFile 	            <strcat(outDir,"cases.list")>;
 file[] simFileParams        <filesys_mapper; location = simFilesDir>;
-(caseFile, simFileParams) = writeCaseParamFiles(fsweepParams, simFilesDir, utils, mexdex);
+(caseFile, simFileParams) = writeCaseParamFiles(fsweepParams, simFilesDir, mexdex);
 
 # Generate geometry and mesh for each case
 file[] fallFoamCaseDirs;
