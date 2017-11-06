@@ -11,3 +11,5 @@
 /outputs.tmp/
 /outputs.backup/
 /outputs.tgz
+output.html
+output.csv

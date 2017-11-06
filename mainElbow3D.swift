@@ -9,12 +9,15 @@ string sweepParamsFileName  = arg("sweepParamFile", "sweepParams_fast2.run");
 file fsweepParams		    <strcat("inputs/",sweepParamsFileName)>;
 string saveSimResults  = arg("saveSimResults","false");
 
+file outhtml <arg("html","output.html")>;
+file outcsv <arg("csv","output.csv")>;
 
 # directory definitions
 string outDir               = "outputs/";
 string errorsDir            = strcat(outDir, "errorFiles/");
 string logsDir              = strcat(outDir, "logFiles/");
 string simFilesDir          = strcat(outDir, "simParamFiles/");
+string pngOutDirRoot        = strcat(outDir,"png/");
 string caseDirs             = strcat(outDir, "case");
 
 # Script files and utilities
@@ -46,6 +49,11 @@ app (file MetricsOutput, file[] fpngs, file fRawResultsTar, file fOut, file fErr
     bash "utils/PVExtract.sh" filename(fOpenCaseTar) filename(fRawResultsTar) filename(metrics2extract) extractOutDir filename(MetricsOutput) saveSimResults filename(fOut) filename(fErr);
 }
 
+app (file outcsv, file outhtml, file so, file se) designExplorer (string runPath, file caselist, file metrics2extract, string pngOutDirRoot, string caseDirRoot, file[] MetricsFiles, file utils[], file mexdex[])
+{
+  bash "mexdex/postprocess.sh" filename(outcsv) filename(outhtml) runPath filename(caselist) filename(metrics2extract) pngOutDirRoot caseDirRoot stdout=filename(so) stderr=filename(se);
+}
+
 #----------------workflow-------------------#
 
 # Read parameters from the sweepParams file and write to case files
@@ -67,13 +75,21 @@ foreach fsimParams,i in simFileParams{
 
 # Run openFoam and extract metrics for each case
 file [][] allCasesPngs;
+file[] MetricsFiles;
 foreach fOpenCaseTar,i in fallFoamCaseDirs{
     file MetricsOutput  <strcat(caseDirPaths[i], "metrics.csv")>;
-    string extractOutDir = strcat(outDir,"png/",i,"/");
+    string extractOutDir = strcat(pngOutDirRoot,"/",i,"/");
     file fcasePngs[]	 <filesys_mapper;location=extractOutDir>;
 	file fRunOut       <strcat(logsDir, "extractRun", i, ".out")>;
 	file fRunErr       <strcat(errorsDir, "extractRun", i ,".err")>;
     file caseRawResults <strcat(caseDirPaths[i],"/caseResults.tar")>;
     (MetricsOutput, fcasePngs, caseRawResults, fRunOut, fRunErr) = runSimExtractMetrics(fOpenCaseTar, metrics2extract, extractOutDir, saveSimResults, utils, mexdex);
     allCasesPngs[i] = fcasePngs;
+    MetricsFiles[i] = MetricsOutput;
 }
+
+# Build the Design Explorer files
+file fDEout       <strcat(logsDir, "DE.out")>; 
+file fDEerr       <strcat(errorsDir, "DE.err")>;
+
+(outcsv,outhtml,fDEout, fDEerr) = designExplorer(runPath, caseFile, metrics2extract, pngOutDirRoot, caseDirs, MetricsFiles, utils, mexdex);
