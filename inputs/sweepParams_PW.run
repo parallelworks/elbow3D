@@ -1,0 +1,1 @@
+R;geometry;8|r;geometry;2|L1;geometry;32|L2;geometry;32_40|Rcurve;geometry;24|xIn2;geometry;54.5|yIn2;geometry;-4.5|Inlet1_Velocity;BoundaryConditions;-1.0|Inlet2_Velocity;BoundaryConditions;-2.0_-4.0|endTime;simulation;40.0|writeInterval;simulation;1.0|meshMinLevel;mesh;0|meshMaxLevel;mesh;1|

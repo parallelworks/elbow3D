@@ -22,7 +22,7 @@ string caseDirs             = strcat(outDir, "case");
 
 # Script files and utilities
 file geomScript             <"utils/elbow3D_SalomeGeom.py">;
-file metrics2extract        <"utils/elbowKPI.json">;
+file metrics2extract        <"mexdex/elbowKPI.json">;
 string fFoamCaseRootPath    = "openFoamCase";
 file[] fFoamCase            <Ext; exec = "utils/mapper.sh", root = fFoamCaseRootPath>;
 file writeBlockMeshScript   <"utils/writeBlockMeshDictFile.py">;
