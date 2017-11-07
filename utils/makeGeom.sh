@@ -19,7 +19,7 @@ fOutDir=$(dirname "${fOut}")
 mkdir -p $fOutDir
 
 if [ "$embeddedDocker" = true ] ; then
-    run_command="docker run --rm  -i -v `pwd`:/scratch -w /scratch -u $(id -u):$(id -g) parallelworks/salome:v8_2u /bin/bash"
+	run_command="docker run --rm  -i -v `pwd`:/scratch -w /scratch -u $dockerUserID:$dockerGrpID parallelworks/salome:v8_2u /bin/bash"
 else
     run_command="/bin/bash"
 fi
@@ -33,6 +33,12 @@ mkdir -p $caseDirPath
 cp -r $faomCaseDirPath $caseDirPath
 meshDir=$caseDirPath/$foamDirName/constant/triSurface/
 #sysDir=$caseDirPath/$foamDirName/system/
+
+
+cd $caseDirPath/
+touch $foamDirName.tar
+cd $WORK_DIR
+
 
 # Generate the stl surfaces files using salome
 

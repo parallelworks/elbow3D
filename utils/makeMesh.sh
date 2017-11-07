@@ -11,7 +11,7 @@ fErr=$6
 
 
 if [ "$embeddedDocker" = true ] ; then
-	run_command="docker run --rm  -i   -v `pwd`:/scratch -w /scratch   -u $(id -u):$(id -g) parallelworks/openfoam:v4_1 /bin/bash" 
+	run_command="docker run --rm  -i   -v `pwd`:/scratch -w /scratch   -u $dockerUserID:$dockerGrpID parallelworks/openfoam:v4_1 /bin/bash" 
 else
     run_command="/bin/bash"
 fi
@@ -81,6 +81,7 @@ cp  $caseDirPath/$foamDirName/constant/polyMesh/boundary  $caseDirPath/$foamDirN
 python utils/writeBoundaryFile.py $caseDirPath/$foamDirName/constant/polyMesh/    $caseDirPath/$foamDirName/constant/polyMesh/boundary.ref 1>>$fOut 2>>$fErr 
 
 cd $caseDirPath/
+touch $foamDirName.tar
 tar -cf $foamDirName.tar $foamDirName
 cd $WORK_DIR
 

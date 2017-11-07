@@ -233,6 +233,8 @@ site.local {
 	app.ALL {
         env.OPENFOAMPATH: "/opt/openfoam4/"
 		env.embeddedDocker:"true"
+		env.dockerUserID:"1000"
+		env.dockerGrpID:"1000"
 		executable: "*"
 	}
 }
